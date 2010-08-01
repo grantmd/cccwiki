@@ -59,3 +59,8 @@ pre {
 li {
   margin-bottom: 0.25em;
 }
+
+.wikiword_new {
+  text-decoration: none;
+  border-bottom: 1px dashed;
+}

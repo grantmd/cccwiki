@@ -256,7 +256,7 @@ class WikiWords(Transform):
     if Page.exists(wikiword):
       return '<a class="wikiword" href="/%s">%s</a>' % (wikiword, wikiword)
     else:
-      return wikiword
+      return '<a title="%s does not exist yet. Click to create it." class="wikiword_new" href="/%s?mode=edit">%s?</a>' % (wikiword, wikiword, wikiword)
 
 
 class AutoLink(Transform):

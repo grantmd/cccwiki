@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #
+# Copyright 2010 Myles Grant
 # Copyright 2008 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +23,11 @@ google.appengine.api.datastore to access the datastore.  This is a
 lower-level API on which google.appengine.ext.db depends.
 """
 
-__author__ = 'Bret Taylor'
+__author__ = 'Bret Taylor, Myles Grant'
+__copyright__ = "Copyright 2010, Myles Grant, Copyright 2008 Google Inc"
+__license__ = "Apache"
+__maintainer__ = "Myles Grant"
+__email__ = "myles@mylesgrant.com"
 
 import cgi
 import datetime

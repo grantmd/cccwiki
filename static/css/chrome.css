@@ -1,0 +1,75 @@
+body {
+  margin: 0;
+}
+
+#header .top {
+  height: 33px;
+  position: relative;
+}
+
+#header .top .title {
+  position: absolute;
+  top: 5px;
+  left: 6px;
+}
+
+#header .top .title img {
+  width: 211px;
+  height: 26px;
+  border: 0;
+}
+
+#header .top .login {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+}
+
+#header .top .login .nickname {
+  font-weight: bold;
+}
+
+#header .bottom {
+  clear: both;
+  background-color: #c3d9ff;
+  padding: 3px;
+  padding-left: 5px;
+  padding-right: 7px;
+}
+
+#header .bottom .attribution {
+  float: right;
+  padding-top: 3px;
+  padding-right: 4px;
+}
+
+#header .bottom .buttons .item {
+  margin-right: 4px;
+}
+
+#body {
+  clear: both;
+  margin: 30px;
+  margin-top: 20px;
+  position: relative;
+}
+
+#footer {
+  margin-top: 4em;
+}
+
+a.button, input[type^="submit"], input[type^="button"] {
+  margin: 0;
+  padding: 2px 5px 2px 5px;
+  font-family: Arial, Sans-serif;
+  font-size: 12px;
+  text-decoration: none;
+  color: #222;
+  cursor: default;
+  background: #ddd url("/static/images/button-background.gif") repeat-x 0 0;
+  border: 1px solid #aaa;
+}
+
+a.button:hover, input[type^="submit"]:hover, input[type^="button"]:hover {
+  border-color: #9cf #69e #69e #7af;
+}

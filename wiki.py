@@ -47,6 +47,8 @@ from google.appengine.ext.webapp import template
 # Set to true if we want to have our webapp print stack traces, etc
 _DEBUG = True
 
+_VALID_WIKINAME = re.compile(r'([A-Z0-9])\w+(([A-Z0-9])\w+)+')
+
 class BaseRequestHandler(webapp.RequestHandler):
   """Supplies a common template generation function.
 
@@ -81,6 +83,20 @@ class WikiPage(BaseRequestHandler):
     # Load the main page by default
     if not page_name:
       page_name = 'MainPage'
+
+    # TODO: Handle ReservedPages here. These are pages which have their own code and templates
+    # and therefore cannot be created/edited. Examples: RecentChanges and PhotoUpload
+
+    # Is page_name valid?
+    if not _VALID_WIKINAME.match(page_name):
+      self.error(404)
+      self.generate('404.html')
+      return
+
+    if page_name.count('_'):
+      name_clean = page_name.replace('_', '') # Strip all underscores
+      self.redirect(self.request.url.replace(page_name, name_clean), permanent=True)
+
     page = Page.load(page_name)
 
     # Default to edit for pages that do not yet exist
@@ -103,16 +119,16 @@ class WikiPage(BaseRequestHandler):
     })
 
   def post(self, page_name):
+    # Is page_name valid?
+    if not _VALID_WIKINAME.match(page_name):
+      self.redirect('/')
+
     # User must be logged in to edit
     if not users.GetCurrentUser():
       # The GET version of this URI is just the view/edit mode, which is a
       # reasonable thing to redirect to
       self.redirect(users.CreateLoginURL(self.request.uri))
       return
-
-    # We need an explicit page name for editing
-    if not page_name:
-      self.redirect('/')
 
     # Create or overwrite the page
     page = Page.load(page_name)
@@ -200,7 +216,7 @@ class Page(object):
     is called.
     """
     query = datastore.Query('Page')
-    query['name ='] = name
+    query['name ='] = name.replace('_', '') # Strip all underscores
     entities = query.Get(1)
     if len(entities) < 1:
       return Page(name)
@@ -249,7 +265,7 @@ class WikiWords(Transform):
   We look up all words, and we only link those words that currently exist.
   """
   def __init__(self):
-    self.regexp = re.compile(r'[A-Z][a-z]+([A-Z][a-z]+)+')
+    self.regexp = _VALID_WIKINAME
 
   def replace(self, match):
     wikiword = match.group(0)

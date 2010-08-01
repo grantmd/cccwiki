@@ -97,7 +97,7 @@ class WikiPage(BaseRequestHandler):
       self.redirect(users.CreateLoginURL(self.request.uri))
       return
 
-    # Genertate the appropriate template
+    # Generate the appropriate template
     self.generate(mode + '.html', {
       'page': page,
     })

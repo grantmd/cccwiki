@@ -6,6 +6,7 @@ api_version: 1
 handlers:
 - url: /admin/.*
   script: $PYTHON_LIB/apphosting/ext/admin/
+  login: admin
 
 - url: /favicon.ico
   static_files: static/favicon.ico

@@ -134,6 +134,7 @@ class WikiPage(BaseRequestHandler):
     # Create or overwrite the page
     page = Page.load(page_name)
     page.content = self.request.get('content')
+    page.remote_addr = self.request.remote_addr
     page.save()
     self.redirect(page.view_url())
 
@@ -205,6 +206,7 @@ class Page(object):
       entity = datastore.Entity('Page')
       entity['name'] = self.name
       entity['created'] = now
+
     entity['content'] = datastore_types.Text(self.content)
     entity['modified'] = now
 
@@ -216,6 +218,22 @@ class Page(object):
     datastore.Put(entity)
     memcache.delete('page_'+self.name)
     memcache.delete('content_'+self.name)
+
+    # Any time the page is saved, we store a copy in history
+    self.save_to_history()
+
+  def save_to_history(self):
+    """Saves this page in the history datastore."""
+    entity = datastore.Entity('PageHistory')
+    entity['name'] = self.name
+    entity['created'] = self.created
+    entity['content'] = datastore_types.Text(self.content)
+    entity['remote_addr'] = self.remote_addr
+
+    if users.GetCurrentUser():
+      entity['user'] = users.GetCurrentUser()
+
+    datastore.Put(entity)
 
   @staticmethod
   def load(name):
@@ -243,6 +261,21 @@ class Page(object):
     """Returns true if the page with the given name exists in the datastore."""
     return Page.load(name).entity
 
+  @staticmethod
+  def load_from_history(name, created):
+    """Loads the page with the given name and creation time from history.
+
+    We always return a Page instance so that a new Page object will be 
+    created when save() is called.
+    """
+    query = datastore.Query('PageHistory')
+    query['name ='] = name
+    query['created ='] = created
+    entities = query.Get(1)
+    if len(entities) < 1:
+      return Page(name)
+    else:
+      return Page(name, entities[0])
 
 class Transform(object):
   """Abstraction for a regular expression transform.

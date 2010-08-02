@@ -36,6 +36,7 @@ import re
 import sys
 import urllib
 import urlparse
+import difflib
 import wsgiref.handlers
 
 from google.appengine.api import datastore
@@ -104,7 +105,7 @@ class WikiPage(BaseRequestHandler):
     if not page.entity:
       mode = 'edit'
     else:
-      modes = ['view', 'edit']
+      modes = ['view', 'edit', 'history', 'diff']
       mode = self.request.get('mode')
       if not mode in modes:
         mode = 'view'
@@ -115,9 +116,20 @@ class WikiPage(BaseRequestHandler):
       return
 
     # Generate the appropriate template
-    self.generate(mode + '.html', {
-      'page': page,
-    })
+    if mode == 'history':
+      self.generate(mode + '.html', {
+        'page': page,
+        'history': page.fetch_history(),
+      })
+    elif mode == 'diff':
+      self.generate(mode + '.html', {
+        'page': page,
+        'diff': page.diff_history(self.request.get('v1'), self.request.get('v2'))
+      })
+    else:
+      self.generate(mode + '.html', {
+        'page': page,
+      })
 
   def post(self, page_name):
     # Is page_name valid?

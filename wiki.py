@@ -191,7 +191,9 @@ class Page(object):
       content = self.content
       for transform in transforms:
         content = transform.run(content)
-      memcache.set('content_'+self.name, content)
+      # TODO: Enable memcache storing of the transformed data, once we track which pages link to others so we can clear
+      # the content caches for pages linking to edited pages. Does that make sense? Good.
+      #memcache.set('content_'+self.name, content)
       return content
 
   def save(self):
@@ -211,9 +213,9 @@ class Page(object):
     elif entity.has_key('user'):
       del entity['user']
 
-    memcache.delete('page_'+page)
-    memcache.delete('content_'+page)
     datastore.Put(entity)
+    memcache.delete('page_'+self.name)
+    memcache.delete('content_'+self.name)
 
   @staticmethod
   def load(name):
@@ -223,9 +225,9 @@ class Page(object):
     the database. In that case, the Page object will be created when save()
     is called.
     """
-    data = memcache.get('page_'+page)
+    data = memcache.get('page_'+name)
     if data is not None:
-      return data
+      return Page(name, data)
     else:
       query = datastore.Query('Page')
       query['name ='] = name.replace('_', '') # Strip all underscores
@@ -233,7 +235,7 @@ class Page(object):
       if len(entities) < 1:
         return Page(name)
       else:
-	memcache.set('page_'+page, entities[0])
+	memcache.set('page_'+name, entities[0])
         return Page(name, entities[0])
 
   @staticmethod

@@ -24,7 +24,7 @@ lower-level API on which google.appengine.ext.db depends.
 """
 
 __author__ = 'Bret Taylor, Myles Grant'
-__copyright__ = "Copyright 2010, Myles Grant, Copyright 2008 Google Inc"
+__copyright__ = "Copyright 2010 Myles Grant, Copyright 2008 Google Inc"
 __license__ = "Apache"
 __maintainer__ = "Myles Grant"
 __email__ = "myles@mylesgrant.com"
@@ -42,6 +42,7 @@ from google.appengine.api import datastore
 from google.appengine.api import datastore_types
 from google.appengine.api import users
 from google.appengine.ext import webapp
+from google.appengine.api import memcache
 from google.appengine.ext.webapp import template
 
 # Set to true if we want to have our webapp print stack traces, etc
@@ -183,10 +184,15 @@ class Page(object):
       WikiWords(),
       HideReferers(),
     ]
-    content = self.content
-    for transform in transforms:
-      content = transform.run(content)
-    return content
+    data = memcache.get('content_'+self.name)
+    if data is not None:
+      return data
+    else:
+      content = self.content
+      for transform in transforms:
+        content = transform.run(content)
+      memcache.set('content_'+self.name, content)
+      return content
 
   def save(self):
     """Creates or edits this page in the datastore."""
@@ -205,6 +211,8 @@ class Page(object):
     elif entity.has_key('user'):
       del entity['user']
 
+    memcache.delete('page_'+page)
+    memcache.delete('content_'+page)
     datastore.Put(entity)
 
   @staticmethod
@@ -215,13 +223,18 @@ class Page(object):
     the database. In that case, the Page object will be created when save()
     is called.
     """
-    query = datastore.Query('Page')
-    query['name ='] = name.replace('_', '') # Strip all underscores
-    entities = query.Get(1)
-    if len(entities) < 1:
-      return Page(name)
+    data = memcache.get('page_'+page)
+    if data is not None:
+      return data
     else:
-      return Page(name, entities[0])
+      query = datastore.Query('Page')
+      query['name ='] = name.replace('_', '') # Strip all underscores
+      entities = query.Get(1)
+      if len(entities) < 1:
+        return Page(name)
+      else:
+	memcache.set('page_'+page, entities[0])
+        return Page(name, entities[0])
 
   @staticmethod
   def exists(name):

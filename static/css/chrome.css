@@ -73,3 +73,8 @@ a.button, input[type^="submit"], input[type^="button"] {
 a.button:hover, input[type^="submit"]:hover, input[type^="button"]:hover {
   border-color: #9cf #69e #69e #7af;
 }
+
+.wikiword_new {
+  text-decoration: none;
+  border-bottom: 1px dashed;
+}

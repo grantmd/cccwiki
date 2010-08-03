@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{{ application_name }} - {{ page.name|escape }} - History{% endblock %}
+
+{% block buttons %}<span class="item"><input type="button" onclick="location.href='{{ page.edit_url|escape }}'" value="Edit This Page"/></span><span class="item"><input type="button" onclick="location.href='{{ page.history_url|escape }}'" value="History"/></span>{% endblock %}
+
+{% block body %}
+<table id="page_history">
+	<tr>
+		<th>Date</th>
+		<th>&nbsp;</th>
+		<th>Author</th>
+		<th>Summary</th>
+		<th>Actions</th>
+	</tr>
+	{% for old_page in history %}
+	<tr>
+		<td>{{ old_page.created|date:"r" }}</td>
+		<td></td>
+		<td>{{ old_page.user.nickname|default:"<i>Anonymous</i>" }}</td>
+		<td>{{ old_page.comment|default:"<i>None</i>" }}</td>
+		<td></td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock %}

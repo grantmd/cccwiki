@@ -180,6 +180,9 @@ class Page(object):
   def entity(self):
     return self.entity
 
+  def history_url(self):
+    return '/' + self.name + '?mode=history'
+
   def edit_url(self):
     return '/' + self.name + '?mode=edit'
 
@@ -246,6 +249,14 @@ class Page(object):
       entity['user'] = users.GetCurrentUser()
 
     datastore.Put(entity)
+
+  def fetch_history(self):
+    """Fetch the history of this page.
+    """
+    query = datastore.Query('PageHistory')
+    query['name ='] = self.name
+    query.Order('created')
+    return query.Get(1000)
 
   @staticmethod
   def load(name):

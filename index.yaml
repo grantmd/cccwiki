@@ -14,3 +14,9 @@ indexes:
   properties:
   - name: name
   - name: created
+
+- kind: PageHistory
+  properties:
+  - name: name
+  - name: created
+    direction: desc

@@ -147,6 +147,7 @@ class WikiPage(BaseRequestHandler):
     page = Page.load(page_name)
     page.content = self.request.get('content')
     page.remote_addr = self.request.remote_addr
+    page.comment = self.request.get('comment')
     page.save()
     self.redirect(page.view_url())
 
@@ -241,9 +242,10 @@ class Page(object):
     """Saves this page in the history datastore."""
     entity = datastore.Entity('PageHistory')
     entity['name'] = self.name
-    entity['created'] = self.created
+    entity['created'] = self.modified
     entity['content'] = datastore_types.Text(self.content)
     entity['remote_addr'] = self.remote_addr
+    entity['comment'] = self.comment
 
     if users.GetCurrentUser():
       entity['user'] = users.GetCurrentUser()
@@ -255,7 +257,7 @@ class Page(object):
     """
     query = datastore.Query('PageHistory')
     query['name ='] = self.name
-    query.Order('created')
+    query.Order(('created', datastore.Query.DESCENDING))
     return query.Get(1000)
 
   @staticmethod

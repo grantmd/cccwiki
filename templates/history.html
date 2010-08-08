@@ -18,7 +18,7 @@
 	{% for old_page in history %}
 	<tr>
 		<td>{{ old_page.created|date:"r" }}</td>
-		<td align="center"><input type="radio" name="v1" value="{{ old_page.key|escape }}" {% ifequal forloop.counter 2 %}CHECKED {% endifequal %}/><input type="radio" name="v2" value="{{ old_page.key|escape }}" {% ifequal forloop.counter 1 %}CHECKED {% endifequal %}/></td>
+		<td align="center"><input type="radio" name="v1" value="{{ old_page.created|date:"U" }}" {% ifequal forloop.counter 2 %}CHECKED {% endifequal %}/><input type="radio" name="v2" value="{{ old_page.created|date:"U" }}" {% ifequal forloop.counter 1 %}CHECKED {% endifequal %}/></td>
 		<td>{{ old_page.user.nickname|default:"<i>Anonymous</i>" }}</td>
 		<td>{{ old_page.comment|default:"<i>None</i>" }}</td>
 		<td></td>

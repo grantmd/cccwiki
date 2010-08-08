@@ -5,10 +5,12 @@
 {% block buttons %}<span class="item"><input type="button" onclick="location.href='{{ page.edit_url|escape }}'" value="Edit This Page"/></span><span class="item"><input type="button" onclick="location.href='{{ page.history_url|escape }}'" value="History"/></span>{% endblock %}
 
 {% block body %}
+<form method="get" action="{{ page.view_url|escape }}">
+<input type="hidden" name="mode" value="diff" />
 <table id="page_history">
 	<tr>
 		<th>Date</th>
-		<th>&nbsp;</th>
+		<th><input type="submit" value="Compare" /></th>
 		<th>Author</th>
 		<th>Summary</th>
 		<th>Actions</th>
@@ -16,11 +18,12 @@
 	{% for old_page in history %}
 	<tr>
 		<td>{{ old_page.created|date:"r" }}</td>
-		<td></td>
+		<td align="center"><input type="radio" name="v1" value="{{ old_page.created|date:"U" }}" {% ifequal forloop.counter 2 %}CHECKED {% endifequal %}/><input type="radio" name="v2" value="{{ old_page.created|date:"U" }}" {% ifequal forloop.counter 1 %}CHECKED {% endifequal %}/></td>
 		<td>{{ old_page.user.nickname|default:"<i>Anonymous</i>" }}</td>
 		<td>{{ old_page.comment|default:"<i>None</i>" }}</td>
 		<td></td>
 	</tr>
 	{% endfor %}
 </table>
+</form>
 {% endblock %}

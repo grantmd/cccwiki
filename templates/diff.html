@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}{{ application_name }} - {{ page.name|escape }} - History{% endblock %}
+
+{% block buttons %}<span class="item"><input type="button" onclick="location.href='{{ page.edit_url|escape }}'" value="Edit This Page"/></span><span class="item"><input type="button" onclick="location.href='{{ page.history_url|escape }}'" value="History"/></span>{% endblock %}
+
+{% block body %}
+  {% if diff %}
+    {{ diff }}
+  {% else %}
+    <p>There is no diff between those two versions.</p>
+  {% endif %}
+{% endblock %}

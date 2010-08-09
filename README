@@ -1,7 +1,22 @@
+What?
+==========
 A wiki that runs on Google App Engine. Based on the original code from Google, which has not been maintained.
 
-Demo: http://cccwiki2.appspot.com/
-Original Source: http://code.google.com/p/google-app-engine-samples/source/browse/trunk/cccwiki
+Why?
+==========
+I had a need for a lightweight wiki I could run on Google App Engine. Running it on App Engine meant I didn't have to worry about hosting it myself, and with the traffic I was expecting, it would be free. All the Python wiki software I could find was either flat out incompatible with App Engine or Django-based. I've been down the road of trying to get Django apps running on App Engine, and I never want to go back there.
 
-Updates by:
+Google had provided cccwiki as one of their App Engine examples, but it lacked basic wiki features like tracking history, feeds, and search. So I decided to take the code, put it on github, and hack at it until it did what I wanted. Hopefully it ends up being useful for someone else too.
+
+Where?
+==========
+Demo: http://cccwiki2.appspot.com/
+Source: http://github.com/grantmd/cccwiki
+
+Who?
+==========
+Original Source by Google:
+http://code.google.com/p/google-app-engine-samples/source/browse/trunk/cccwiki
+
+Updates/Maintenance by:
 Myles Grant <myles@mylesgrant.com>

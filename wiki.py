@@ -169,7 +169,10 @@ class Page(object):
       else:
         self.user = None
       self.created = entity['created']
-      self.modified = entity['modified']
+      if entity.has_key('modified'):
+        self.modified = entity['modified']
+      else:
+        self.modified = entity['created']
     else:
       # New pages should start out with a simple title to get the user going
       now = datetime.datetime.now()
@@ -253,12 +256,24 @@ class Page(object):
     datastore.Put(entity)
 
   def fetch_history(self):
-    """Fetch the history of this page.
-    """
+    """Fetch the history of this page."""
     query = datastore.Query('PageHistory')
     query['name ='] = self.name
     query.Order(('created', datastore.Query.DESCENDING))
     return query.Get(1000)
+
+  def diff_history(self, v1, v2):
+    """Return the diff of two versions of this page, or None if either of the versions doesn't exist"""
+    page_v1 = Page.load_from_history(self.name, v1)
+    page_v2 = Page.load_from_history(self.name, v2)
+
+    if not page_v1 or not page_v2:
+	return None
+
+    v1_desc = "Edited on %s by %s" % (page_v1.created.strftime("%a, %b %d, %Y at %I:%M %p"), page_v1.user.nickname())
+    v2_desc = "Edited on %s by %s" % (page_v2.created.strftime("%a, %b %d, %Y at %I:%M %p"), page_v2.user.nickname())
+    diff = difflib.HtmlDiff().make_table(page_v1.content.splitlines(1), page_v2.content.splitlines(1), v1_desc, v2_desc, context=True)
+    return diff
 
   @staticmethod
   def load(name):
@@ -287,18 +302,14 @@ class Page(object):
     return Page.load(name).entity
 
   @staticmethod
-  def load_from_history(name, created):
-    """Loads the page with the given name and creation time from history.
-
-    We always return a Page instance so that a new Page object will be 
-    created when save() is called.
-    """
+  def load_from_history(name, key):
+    """Loads the page with the given name and key from history."""
     query = datastore.Query('PageHistory')
     query['name ='] = name
-    query['created ='] = created
+    query['__key__ ='] = datastore_types.Key(key)
     entities = query.Get(1)
     if len(entities) < 1:
-      return Page(name)
+      return None
     else:
       return Page(name, entities[0])
 
